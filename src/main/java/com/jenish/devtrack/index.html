@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DevTrack</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            background: #0f0f0f;
+            color: white;
+            padding: 20px;
+        }
+        h1 { color: #00ff88; }
+        .slider-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        input[type=range] { width: 100%; margin: 10px 0; }
+        textarea {
+            width: 100%;
+            background: #1a1a1a;
+            color: white;
+            border: 1px solid #333;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        button {
+            background: #00ff88;
+            color: black;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        #pet { font-size: 60px; text-align: center; margin: 20px 0; }
+        #mode-label { text-align: center; color: #00ff88; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+    <h1>DevTrack</h1>
+
+    <div id="pet">🤖</div>
+    <div id="mode-label">ROBO</div>
+
+    <div class="slider-row">
+        <span>Learning</span>
+        <span>Doing</span>
+    </div>
+    <input type="range" id="slider" min="0" max="100" value="50"
+           oninput="updatePet(this.value)">
+
+    <p>Rate your day:</p>
+    <input type="range" id="score" min="1" max="5" value="3">
+
+    <textarea id="note" rows="3" placeholder="What did you work on today?"></textarea>
+
+    <button onclick="saveEntry()">Save Entry</button>
+
+    <div id="message" style="margin-top:15px;text-align:center"></div>
+
+<script>
+    function updatePet(val) {
+        const pet = document.getElementById('pet');
+        const label = document.getElementById('mode-label');
+        if (val <= 35) {
+            pet.innerText = '🤖';
+            label.innerText = 'ROBO — Learning mode';
+        } else if (val <= 65) {
+            pet.innerText = '🦾';
+            label.innerText = 'HYBRID — Balanced mode';
+        } else {
+            pet.innerText = '⚔️';
+            label.innerText = 'WARRIOR — Doing mode';
+        }
+    }
+
+    function saveEntry() {
+        const slider = document.getElementById('slider').value;
+        const score = document.getElementById('score').value;
+        const note = document.getElementById('note').value;
+
+        fetch(`http://localhost:8080/api/entry?slider=${slider}&score=${score}&note=${note}`, {
+            method: 'POST'
+        })
+        .then(res => res.text())
+        .then(data => {
+            document.getElementById('message').innerText = '✅ ' + data;
+        })
+        .catch(err => {
+            document.getElementById('message').innerText = '❌ Error: ' + err;
+        });
+    }
+</script>
+
+</body>
+</html>
